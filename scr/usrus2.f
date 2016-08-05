@@ -1,0 +1,83 @@
+C$ #1 BY: ANAVI DATE:  1-JUL-1994 NEW FOR USER MODELS
+C
+C     User Unit Operation Model (or Report) Subroutine for USER2
+C
+      SUBROUTINE USRUS2 (NMATI,  SIN,    NINFI,   SINFI,  NMATO,
+     2                   SOUT,   NINFO,  SINFO,   IDSMI,  IDSII,
+     3                   IDSMO,  IDSIO,  NTOT,    NSUBS,  IDXSUB,
+     4                   ITYPE,  NINT,   INT,     NREAL,  REAL,
+     5                   IDS,    NPO,    NBOPST,  NIWORK, IWORK,
+     6                   NWORK,  WORK,   NSIZE,   SIZE,   INTSIZ,
+     7                   LD   )
+C
+      IMPLICIT NONE
+C
+C     DECLARE VARIABLES USED IN DIMENSIONING
+C
+      INTEGER NMATI, NINFI, NMATO, NINFO, NTOT,
+     +        NSUBS, NINT,  NPO,   NIWORK,NWORK,
+     +        NSIZE
+C
+#include "ppexec_user.cmn"
+      EQUIVALENCE (RMISS, USER_RUMISS)
+      EQUIVALENCE (IMISS, USER_IUMISS)
+C
+C
+C
+#include "dms_ncomp.cmn"
+C
+C     THIS SUBROUTINE WILL SEPARATE WATER INTO THE SECOND OUTLET
+C
+C     FIRST COPY FIRST INLET TO FIRST OUTLET
+C
+C
+C     DECLARE ARGUMENTS
+C
+      INTEGER IDSMI(2,NMATI),      IDSII(2,NINFI),
+     +        IDSMO(2,NMATO),      IDSIO(2,NINFO),
+     +        IDXSUB(NSUBS),ITYPE(NSUBS), INT(NINT),
+     +        IDS(2,3),     NBOPST(6,NPO),
+     +        IWORK(NIWORK),INTSIZ(NSIZE),NREAL, LD,    I
+      INTEGER KH2O
+      REAL*8 SIN(NTOT,NMATI),     SINFI(NINFI),
+     +       SOUT(NTOT,NMATO),    SINFO(NINFO),
+     +       WORK(NWORK),  SIZE(NSIZE)
+C
+C     DECLARE LOCAL VARIABLES
+C
+      INTEGER IMISS, DMS_KFORMC
+      REAL*8 REAL(NREAL),  RMISS, WATER
+C
+C     BEGIN EXECUTABLE CODE
+C
+      DO 100 I = 1, NTOT
+        SOUT(I,1) = SIN(I,1)
+ 100  CONTINUE
+C
+C     INITIALIZE THE SECOND OUTLET
+C
+      DO 200 I = 1, NCOMP_NCC+1
+        SOUT(I,2) = 0D0
+ 200  CONTINUE
+C
+      DO 300 I = NCOMP_NCC+2, NCOMP_NCC+9
+        SOUT(I,2) = RMISS
+ 300  CONTINUE
+C
+C     LOCATE WATER
+C
+      KH2O = DMS_KFORMC ( 'H2O' )
+      IF ( KH2O .EQ. 0 ) GO TO 999
+C
+C     PUT THE WATER IN THE SECOND OUTLET
+C
+      WATER = SIN(KH2O,1)
+      SOUT(KH2O,1) = 0D0
+      SOUT(NCOMP_NCC+1,1) = SIN(NCOMP_NCC+1,1) - WATER
+      SOUT(KH2O,2) = WATER
+      SOUT(NCOMP_NCC+1,2) = WATER
+C
+ 999  RETURN
+      END
+
+
