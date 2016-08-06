@@ -1,7 +1,7 @@
 C$ #1 BY: ANAVI DATE:  1-JUL-1994 NEW FOR USER MODELS
 C
 C     User Unit Operation Model (or Report) Subroutine for USER2
-C
+C     
       SUBROUTINE GLCA  (NMATI,  SIN,    NINFI,   SINFI,  NMATO,
      2                   SOUT,   NINFO,  SINFO,   IDSMI,  IDSII,
      3                   IDSMO,  IDSIO,  NTOT,    NSUBS,  IDXSUB,
@@ -9,6 +9,8 @@ C
      5                   IDS,    NPO,    NBOPST,  NIWORK, IWORK,
      6                   NWORK,  WORK,   NSIZE,   SIZE,   INTSIZ,
      7                   LD   )
+C
+      use CommonDef
 C
       IMPLICIT NONE
 C
@@ -48,7 +50,7 @@ C
 C
 C     Declare the variables used in model calculation
       INTEGER OPT(2)
-      REAL*8 OSIZE, PITCH, COEFF(8)
+      REAL*8 OSIZE, PITCH, COEFF(8), SA, ETA
 C     BEGIN EXECUTABLE CODE
 C     Get the GLCA parameters
       IERR = USRUTL_GET_INT_PARAM('OPT0', INDEX, OPT(1))
@@ -118,36 +120,15 @@ C     Copy the influent to effluent
         SOUT(I,2) = SIN(I,2)
  100  CONTINUE
 C
-C     INITIALIZE THE SECOND OUTLET
-C
-      DO 200 I = 1, NCOMP_NCC+1
-        SOUT(I,2) = 0D0
- 200  CONTINUE
-C
-      DO 300 I = NCOMP_NCC+2, NCOMP_NCC+9
-        SOUT(I,2) = RMISS
- 300  CONTINUE
-C
-C     LOCATE WATER
-C
-      KH2O = DMS_KFORMC ( 'H2O' )
-      IF ( KH2O .EQ. 0 ) GO TO 999
-C
-C     PUT THE WATER IN THE SECOND OUTLET
-C
-      WATER = SIN(KH2O,1)
-      SOUT(KH2O,1) = 0D0
-      SOUT(NCOMP_NCC+1,1) = SIN(NCOMP_NCC+1,1) - WATER
-      SOUT(KH2O,2) = WATER
-      SOUT(NCOMP_NCC+1,2) = WATER
-C
+      SA = TWO*PI/(dsqrt(three)*(PITCH/OSIZE)**TWO*OSIZE)
+      ETA = 1.0
 C     Set the calculated results in GLCA
-      IERR = USRUTL_SET_REAL_PARAM('SA', INDEX, 1.0)
+      IERR = USRUTL_SET_REAL_PARAM('SA', INDEX, SA)
       IF (IERR .NE. 0) THEN
         WRITE(USER_NHSTRY, *) 'ERROR STORING MONITOR VARIABLE 2'
         IFAIL = 1
       END IF
-      IERR = USRUTL_SET_REAL_PARAM('ETA', INDEX, 0.0)
+      IERR = USRUTL_SET_REAL_PARAM('ETA', INDEX, ETA)
       IF (IERR .NE. 0) THEN
         WRITE(USER_NHSTRY, *) 'ERROR STORING MONITOR VARIABLE 2'
         IFAIL = 1
