@@ -121,7 +121,7 @@ C     Copy the influent to effluent
  100  CONTINUE
 C
       SA = TWO*PI/(dsqrt(three)*(PITCH/OSIZE)**TWO*OSIZE)
-      ETA = 1.0
+      ETA = 0.1234
 C     Set the calculated results in GLCA
       IERR = USRUTL_SET_REAL_PARAM('SA', INDEX, SA)
       IF (IERR .NE. 0) THEN

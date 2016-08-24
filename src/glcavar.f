@@ -17,7 +17,7 @@
      1  4HSA  ,  4H    ,  4H    ,  4H    ,  1,  -1,  0,  2,
      1  4HETA ,  4H    ,  4H    ,  4H    ,  1,  -1,  0,  2/
 
-      DATA IVRSN/1470469073/
+      DATA IVRSN/1471643559/
       NVARS = IPARAM_NVARS
       IF(IROW .EQ. 0) THEN
           glcavar=IVRSN
