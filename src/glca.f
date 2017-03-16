@@ -24,7 +24,9 @@ C
       EQUIVALENCE (RMISS, USER_RUMISS)
       EQUIVALENCE (IMISS, USER_IUMISS)
 C
-C
+      real*8 B(1)
+#include "dms_plex.cmn"
+      EQUIVALENCE(B(1), IB(1))
 C
 #include "dms_ncomp.cmn"
 C
@@ -47,6 +49,8 @@ C     DECLARE LOCAL VARIABLES
 C
       INTEGER IMISS, DMS_KFORMC, INDEX, IERR, IFAIL
       REAL*8 REAL(NREAL),  RMISS, WATER
+C     Index for locating the particle size distribution (psd)
+      INTEGER LPSD, NSI, LSLIM
 C
 C     Declare the variables used in model calculation
       INTEGER OPT(2)
@@ -114,11 +118,24 @@ C     Get the GLCA parameters
         IFAIL = 1
       END IF 
 C
+C     Get the psd of SIN(*,2)
+      CALL SHS_LOCPSD(LD, 2, LPSD, NSI, LSLIM)
+C     Write the influent psd in report for check
+      DO I = 1, NSI+1
+        WRITE(USER_NRPT, *) 'I, SLIM(I) ', I, B(LSLIM+I-1)
+      END DO
+      DO I = 1, NSI+1
+        WRITE(USER_NRPT, *) 'I, FRAC(I) ', I, SIN(LPSD+I-1,2)
+      END DO
 C     Copy the influent to effluent
       DO 100 I = 1, NTOT
         SOUT(I,1) = SIN(I,1)
         SOUT(I,2) = SIN(I,2)
  100  CONTINUE
+C     Reform the psd of SOUT(*,2)
+      DO I = 1, NSI+1
+        SOUT(LPSD+I-1,2) = 0.1
+      END DO
 C
       SA = TWO*PI/(dsqrt(three)*(PITCH/OSIZE)**TWO*OSIZE)
       ETA = 1.0
