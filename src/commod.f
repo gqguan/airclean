@@ -426,4 +426,16 @@ c         Generate the grid data
         DSUM = tmp
       end function
       
+      ! Calculate the mean of given distribution
+      real(8) function DMEAN(fx, fy)
+        real*8, intent(in) :: fx(:), fy(:)
+        integer :: size_fxy, i
+        size_fxy = size(fx, dim=1)
+        tmp = zero
+        do i = 1, size_fxy
+          tmp = tmp+fx(i)*fy(i)
+        end do
+        DMEAN = tmp
+      end function
+      
       end module
